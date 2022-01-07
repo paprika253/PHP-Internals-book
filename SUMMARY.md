@@ -1,17 +1,5 @@
 # Table of contents
 
 * [Welcome!](README.md)
-
-## The Company
-
-* [Vision and Values](the-company/vision-and-values.md)
-* [Meet the Team!](the-company/meet-the-team.md)
-
-## The Formal Stuff
-
-* [Requesting Time Off](the-formal-stuff/requesting-time-off.md)
-* [Filing Expenses](the-formal-stuff/filing-expenses.md)
-
-***
-
-* [Управление памятью](upravlenie-pamyatyu.md)
+* [Управление памятью](upravlenie-pamyatyu/README.md)
+  * [Zend Memory Manager](upravlenie-pamyatyu/zend-memory-manager.md)
