@@ -86,3 +86,21 @@ zend_hash_destroy(&ar);
 API знает, были ли эти структуры выделены с использованием распределения, связанного с запросом, или постоянного, и в первом случае будет использовать `efree()` для его освобождения, а во втором случае libc `free()`.\
 
 
+## Zend Memory Manager API
+
+API расположено в [Zend/zend\_alloc.h](https://github.com/php/php-src/blob/c3b910370c5c92007c3e3579024490345cb7f9a7/Zend/zend\_alloc.h).\
+Вызовы API - это в основном макросы C, так что будьте готовы, если вы их отлаживаете и хотите понаблюдать как они работают. Эти вызовы являются копией libc вызовов, они обычно прибавляют к названию функции букву 'e'; Так что вы не должны теряться, т.к. в API не так много подробностей.
+
+В основном это то, что вы будете использовать довольно часто - `emalloc(size_t)` и `efree(void *)`.
+
+Также вам предоставляется `ecalloc(size_t nmemb, size_t size)`, который выделяет `nmemb` индивидуальный размер `size` и обнуляет область. Если вы сильный C разработчик с опытом, то вам стоит знать когда это возможно, это лучше для использования `ecalloc()` вместо `emalloc()`, так как `ecalloc()` обнулит область памяти, что может сильно помочь в обнаружении ошибок указателя. Запомните, что `emalloc()` работает в основном так же, как и `malloc()`: он будет искать достаточно большую площадь в пулах и возвращать вам более подходящий. Следовательно, вам может быть предоставлен переработанный указатель, который укажет на мусор.&#x20;
+
+Затем следует `safe_emalloc(size_t nmemb, size_t size, size_t offset)`, который представляет собой `emalloc(size * nmemb + offset)`, но проверяет на переполнение для вас. Вам стоит использовать данный API вызов, если номера, которые вы должны предоставить, предоставлены из ненадежного источника, например пользовательской стороны.
+
+Что касается строковых средств, `estrdup(char *)` и `estrndup(char *, size_t len)` позволяют дублировать строки или бинарные строки.
+
+Что бы не случилось, указатель, возвращаемые ZendMM, должны быть освобождены с помощью ZendMM, который `efree()`, а не libc `free()`.
+
+_<mark style="background-color:orange;">Примечание: Примечание о постоянных распределениях. Постоянные распределения остаются активными между запросами. Обычно вы используете libc</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`malloc/free`</mark><mark style="background-color:orange;">, чтобы выполнить это, но у ZendMM есть несколько ярлыков для libc распределенителей: "постоянное" API. Это API начинается с буквы "p" и дает вам выбор между ZendMM и постоянным распределителем. Следовательно,</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`pemalloc(size_t, 1)`</mark><mark style="background-color:orange;">, это не что иное, как</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`malloc()`</mark><mark style="background-color:orange;">,</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`free(void *, 1)`</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">-</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`это free()`</mark><mark style="background-color:orange;">, а</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`pstrdup(void *, 1)`</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">- это</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`strdup()`</mark><mark style="background-color:orange;">.</mark>_ <mark style="background-color:orange;"></mark><mark style="background-color:orange;"></mark>&#x20;
+
+\
