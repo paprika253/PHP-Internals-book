@@ -103,4 +103,16 @@ API расположено в [Zend/zend\_alloc.h](https://github.com/php/php-sr
 
 _<mark style="background-color:orange;">Примечание: Примечание о постоянных распределениях. Постоянные распределения остаются активными между запросами. Обычно вы используете libc</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`malloc/free`</mark><mark style="background-color:orange;">, чтобы выполнить это, но у ZendMM есть несколько ярлыков для libc распределенителей: "постоянное" API. Это API начинается с буквы "p" и дает вам выбор между ZendMM и постоянным распределителем. Следовательно,</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`pemalloc(size_t, 1)`</mark><mark style="background-color:orange;">, это не что иное, как</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`malloc()`</mark><mark style="background-color:orange;">,</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`free(void *, 1)`</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">-</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`это free()`</mark><mark style="background-color:orange;">, а</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`pstrdup(void *, 1)`</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">- это</mark> <mark style="background-color:orange;"></mark><mark style="background-color:orange;">`strdup()`</mark><mark style="background-color:orange;">.</mark>_ <mark style="background-color:orange;"></mark><mark style="background-color:orange;"></mark>&#x20;
 
+### Отладка Zend Memory Manager
+
+ZendMM предоставляет следующие возможности:
+
+* Управление потребления памяти
+* Отслеживание утечки памяти и ее сброс
+* Ускорение распределения ресурсов благодаря предварительного выделения буферов известного размера и сохранения теплого кэша на свободном
+
+#### &#x20;Управление потребления памяти
+
+ZendMM - это слой, лежащий в основе функции PHP memory\__limit. Каждый байт, выделенный с помощью слоя ZendMM, подсчитывается и добавляется. Когда память наполняется до значения memory\_limit, вы знаете что происходит._ Это также означает, что любое распределение, которое вы выполняете с помощью ZendMM, отражается в вызове memory\_get\_usage() из PHP.
+
 \
